@@ -1,9 +1,9 @@
 {
     "name": "com.dada.commander",
-    "version": "0.5.0",
+    "version": "0.6.0",
 
     "displayName": "Commander",
-    "description": "This is an example package",
+    "description": "Commander is a tool for your Unity game that makes it easy to create cheat commands",
 
     "author": 
     {

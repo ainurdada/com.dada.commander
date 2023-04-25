@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/Version-0.5.0-blue">
+<img src="https://img.shields.io/badge/Version-0.6.0-blue">
 <img src="https://img.shields.io/badge/License-MIT-success">
 </p>
 
@@ -36,6 +36,13 @@ For using Commanders API you should take ```using Dada.Commander```
         //this method invoke method SetMaxFps and give log result
         Commander.ApplyCommand("SetMaxFps", out List<string> log);
     ```
+
+## Console UI
+You also can use built-in console UI. It is located on path `...\UI\Prefab`
+![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)
+Use namespace `Dada.Commander.Ui` for manage console UI
+* To open or close console window use a `ConsoleController.ChangeOpenCloseState()` method.
+* Assign a `ConsoleController.FillAuto()` method call to the button you need. This is responsible for autofill
 
 ## Attribute
 `ConsoleCommand` attribute has next fields:
