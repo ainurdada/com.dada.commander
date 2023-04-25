@@ -51,3 +51,6 @@ For using Commanders API you should take ```using Dada.Commander```
 |`GetAllConsoleTypes`||Get all class names that have methods with `ConsoleCommand` attribute|
 |`GetCommands`|bool `showDescription`|Get all commands with or without their descriptions|
 |`GetCommands`|bool `showDescription` <br/> CommandFlags `commandFlags`|Get commands with or without their descriptions that has `commandFlags`|
+
+## Custom flags
+You can create your custom flag set in `com.dada.cheatconsole\Runtime\CommandFlags.cs` file, but you always should have `all` flag that has all bytes of another flags. 
