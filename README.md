@@ -34,7 +34,7 @@ For using Commanders API you should take ```using Dada.Commander```
     Example:
     ```c#
         //this method invoke method SetMaxFps and give log result
-        Commander.ApplyCommand("SetMaxFps", out List<string> log);
+        Commander.ApplyCommand("SetMaxFps 30", out List<string> log);
     ```
 
 ## Console UI
