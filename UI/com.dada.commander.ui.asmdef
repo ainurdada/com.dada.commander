@@ -1,0 +1,17 @@
+{
+    "name": "com.dada.commander.ui",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d3573e16bce83074ba65c5a1d7c597e5",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

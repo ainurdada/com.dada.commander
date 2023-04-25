@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Dada.Commander.Core
 {
-    public class CommanderManager
+    internal class CommanderManager
     {
         public static string[] fileNames = { "Assets" };
 
@@ -31,7 +31,8 @@ namespace Dada.Commander.Core
 
         List<CashedType> cashedTypes = new List<CashedType>();
 
-        string errorColor = "red";
+        public string textColor = "white";
+        public string errorColor = "red";
 
         /// <summary>
         /// Apply the command and get the log result
@@ -139,7 +140,7 @@ namespace Dada.Commander.Core
                 result = new List<string>() { $"<color={errorColor}>method needs parameters:</color> \n" };
                 foreach(ParameterInfo info in parameterInfo)
                 {
-                    result[0] += $"{info.Position + 1}: ({info.ParameterType}) {info.Name}";
+                    result[0] += $"<color={textColor}>{info.Position + 1}: ({info.ParameterType}) {info.Name}</color>";
                     if (info.Position + 1 != parameterInfo.Length) result[0] += '\n';
                 }
                 return false;
@@ -151,17 +152,23 @@ namespace Dada.Commander.Core
             }
             if (method.ReturnType == typeof(string))
             {
-                result.Add(method.Invoke(obj, parameters) as string);
+                result.Add($"<color={textColor}>{method.Invoke(obj, parameters) as string}</color>");
                 return true;
             }
             if (method.ReturnType == typeof(List<string>))
             {
-                result.AddRange(method.Invoke(obj, parameters) as List<string>);
+                foreach (string str in method.Invoke(obj, parameters) as List<string>)
+                {
+                    result.Add($"<color={textColor}>{str}</color>");
+                }
                 return true;
             }
             if (method.ReturnType == typeof(string[]))
             {
-                result.AddRange(method.Invoke(obj, parameters) as string[]);
+                foreach (string str in method.Invoke(obj, parameters) as string[])
+                {
+                    result.Add($"<color={textColor}>{str}</color>");
+                }
                 return true;
             }
             result = new List<string>() { $"<color={errorColor}>method has unsupported return value</color>" };
@@ -232,10 +239,10 @@ namespace Dada.Commander.Core
             List<string> types = new List<string>();
             foreach (CashedType cashedType in cashedTypes)
             {
-                string typeInfo = $"class {cashedType.type.Name} has {cashedType.methods.Count()} console methods: \n";
+                string typeInfo = $"<color={textColor}>class {cashedType.type.Name} has {cashedType.methods.Count()} console methods:</color> \n";
                 foreach (MethodInfo method in cashedType.methods)
                 {
-                    typeInfo += $"{method.Name} \n";
+                    typeInfo += $"<color={textColor}>{method.Name}</color> \n";
                 }
                 types.Add(typeInfo);
             }
@@ -258,10 +265,11 @@ namespace Dada.Commander.Core
                     if ((method.GetCustomAttribute<ConsoleCommandAttribute>().commandFlag & commandFlags) == 0) continue;
                     string str = method.GetCustomAttribute<ConsoleCommandAttribute>().commandName;
                     if (str == "") str = method.Name;
+                    str = $"<color={textColor}>{str}</color>";
                     if (showDescription)
                     {
                         string _description = method.GetCustomAttribute<ConsoleCommandAttribute>().description;
-                        if (_description != "") str += $" - {_description}";
+                        if (_description != "") str += $"<color={textColor}> - {_description}</color>";
                     }
                     _cmds.Add(str);
                 }
