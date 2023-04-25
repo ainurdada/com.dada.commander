@@ -16,6 +16,7 @@ Commander is a tool for your Unity game that makes it easy to create cheat comma
 3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`
 
 ## Get start
+For using Commanders API you should take ```using Dada.Commander```
 1. Add `ConsoleCommand` attribute for your method.  
     Example:
     ```c#
@@ -31,6 +32,15 @@ Commander is a tool for your Unity game that makes it easy to create cheat comma
         //this method invoke method SetMaxFps and give log result
         Commander.ApplyCommand("SetMaxFps", out List<string> log);
     ```
+
+## Attribute
+`ConsoleCommand` attribute has next fields:
+|Field|Default value|Description|
+|-----|-----------|-------------|
+|`commandName`|`""`|Name for Commander<br/> If you dont set `commandName` it takes name of method|
+|`description`|`""`|Description for Commander <br/> This description can be shown in Commander's log|
+|`logResult`|`""`|Log result that will be written to the Commander's log after successful method apllying|
+|`commandFlag`|`CommandFlags.noFlags`|Flag that describe type of method|
 
 ## Methods
 `Commander` class has next methods:  
