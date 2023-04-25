@@ -10,5 +10,7 @@
 ## About
 Commander is a tool for your game in Unity. 
 ## Installation
-
+1. Open `Package Manager` in Unity
+2. Select `Add package from Git URL`
+3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`
 ## Get start
