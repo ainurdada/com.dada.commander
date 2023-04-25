@@ -8,5 +8,7 @@
 </p>
 
 ## About
+Commander is a tool for your game in Unity. 
+## Installation
 
-## Instalation
+## Get start

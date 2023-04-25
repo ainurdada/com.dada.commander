@@ -2,7 +2,7 @@
     "name": "com.dada.commander",
     "version": "0.5.0",
 
-    "displayName": "commander",
+    "displayName": "Commander",
     "description": "This is an example package",
 
     "author": 
@@ -11,8 +11,8 @@
         "email": "ainurdada@gmail.com",
         "url": "https://github.com/ainurdada"
     },
-    "documentationUrl": "https://github.com/ainurdada/CheatConsole/blob/main/README.md",
-    "licensesUrl": "https://github.com/ainurdada/CheatConsole/blob/main/LICENSE",
+    "documentationUrl": "https://github.com/ainurdada/com.dada.commander/blob/master/README.md",
+    "licensesUrl": "https://github.com/ainurdada/com.dada.commander/blob/master/LICENSE",
    "keywords": [
       "cheat",
       "console",
