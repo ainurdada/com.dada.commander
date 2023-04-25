@@ -36,4 +36,8 @@ Commander is a tool for your Unity game that makes it easy to create cheat comma
 `Commander` class has next methods:  
 |Method|Parameters|Descripton|
 |------|----------|----------|
-|`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method by his command name and give log result. <br/> `command` - command name of method <br/> `log` - log result of applying command|
+|`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method by his command name and get a log result. <br/> `command` - command name of method <br/> `log` - log result of applying command|
+|`GetSimilarCommand`|string `command`|Get the name of the commands that is most similar to the entered `command`|
+|`GetAllConsoleTypes`||Get all class names that have methods with `ConsoleCommand` attribute|
+|`GetCommands`|bool `showDescription`|Get all commands with or without their descriptions|
+|`GetCommands`|bool `showDescription` <br/> CommandFlags `commandFlags`|Get commands with or without their descriptions that has `commandFlags`|

@@ -14,7 +14,7 @@ namespace Dada.Commander
         }
 
         /// <summary>
-        /// Get the name of the command that is most similar to the entered command
+        /// Get the name of the commands that is most similar to the entered command
         /// </summary>
         public static string GetSimilarCommand(string command)
         {
