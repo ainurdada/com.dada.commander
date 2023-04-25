@@ -1,0 +1,22 @@
+{
+    "name": "com.dada.commander",
+    "version": "0.5.0",
+
+    "displayName": "commander",
+    "description": "This is an example package",
+
+    "author": 
+    {
+        "name": "Ainur Gazizov",
+        "email": "ainurdada@gmail.com",
+        "url": "https://github.com/ainurdada"
+    },
+    "documentationUrl": "https://github.com/ainurdada/CheatConsole/blob/main/README.md",
+    "licensesUrl": "https://github.com/ainurdada/CheatConsole/blob/main/LICENSE",
+   "keywords": [
+      "cheat",
+      "console",
+      "command",
+      "debug"
+    ]
+  }
