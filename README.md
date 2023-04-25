@@ -8,9 +8,32 @@
 </p>
 
 ## About
-Commander is a tool for your game in Unity. 
+Commander is a tool for your Unity game that makes it easy to create cheat commands
+
 ## Installation
 1. Open `Package Manager` in Unity
 2. Select `Add package from Git URL`
 3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`
+
 ## Get start
+1. Add `ConsoleCommand` attribute for your method.  
+    Example:
+    ```c#
+        [ConsoleCommand]
+        static void SetMaxFps(int fps)
+        {
+            Application.targetFrameRate = fps;
+        }
+    ```
+2. Now you can manage method with attribute `ConsoleCommand` from any place in your code using `Commander` class.  
+    Example:
+    ```c#
+        //this method invoke method SetMaxFps and give log result
+        Commander.ApplyCommand("SetMaxFps", out List<string> log);
+    ```
+
+## Methods
+`Commander` class has next methods:  
+|Method|Parameters|Descripton|
+|------|----------|----------|
+|`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method by his command name and give log result. <br/> `command` - command name of method <br/> `log` - log result of applying command|
