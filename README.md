@@ -20,7 +20,7 @@ Experiment version:
 3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`
 
 ## Get start
-For using Commanders API you should take ```using Dada.Commander```
+For using Commanders API you should use namespace ```Dada.Commander```
 1. Add `ConsoleCommand` attribute for your method.  
     Example:
     ```c#
@@ -37,13 +37,6 @@ For using Commanders API you should take ```using Dada.Commander```
         Commander.ApplyCommand("SetMaxFps 30", out List<string> log);
     ```
 
-## Console UI
-You also can use built-in console UI. It is located on path `...\UI\Prefab`
-![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)
-Use namespace `Dada.Commander.Ui` for manage console UI
-* To open or close console window use a `ConsoleController.ChangeOpenCloseState()` method.
-* Assign a `ConsoleController.FillAuto()` method call to the button you need. This is responsible for autofill
-
 ## Attribute
 `ConsoleCommand` attribute has next fields:
 |Field|Default value|Description|
@@ -53,8 +46,8 @@ Use namespace `Dada.Commander.Ui` for manage console UI
 |`logResult`|`""`|Log result that will be written to the Commander's log after successful method apllying|
 |`commandFlag`|`CommandFlags.noFlags`|Flag that describe type of method|
 
-## Methods
-`Commander` class has next methods:  
+## API
+### `Commander` class has next methods:   
 |Method|Parameters|Descripton|
 |------|----------|----------|
 |`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method by his command name and get a log result. <br/> `command` - command name of method <br/> `log` - log result of applying command|
@@ -65,3 +58,10 @@ Use namespace `Dada.Commander.Ui` for manage console UI
 
 ## Custom flags
 You can create your own custom flag set in `com.dada.cheatconsole\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
+
+## Console UI
+You also can use built-in console UI. It is located on path `...\UI\Prefab`
+![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)
+Use namespace `Dada.Commander.Ui` to manage console UI
+* To open or close console window use a `ConsoleController.ChangeOpenCloseState()` method.
+* Assign a `ConsoleController.FillAuto()` method call to the button you need. This is responsible for autofill
