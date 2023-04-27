@@ -382,6 +382,7 @@ namespace Dada.Commander.Core
             string appPath = Application.dataPath.Remove(Application.dataPath.Length - 7).Replace('/', '\\');
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies().
+                Where(a => !a.IsDynamic).
                 Where(a => a.Location.StartsWith(appPath)).
                 Where(a => !a.GetName().Name.StartsWith("Unity.")).
                 Where(a => !a.GetName().Name.StartsWith("System.")).
