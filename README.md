@@ -3,12 +3,13 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/Version-0.6.0-blue">
+<img src="https://img.shields.io/badge/Unity-white?style=flat&logo=unity&logoColor=000000">
+<img src="https://img.shields.io/badge/Version-0.7.0-blue">
 <img src="https://img.shields.io/badge/License-MIT-success">
 </p>
 
 ## About
-Commander is a tool for your Unity game that makes it easy to create cheat commands
+Commander is a tool for your Unity game that makes it easy to create cheat commands.  
 
 ## Installation
 Release version:
