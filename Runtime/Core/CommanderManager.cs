@@ -43,9 +43,8 @@ namespace Dada.Commander.Core
         {
             bool match = false;
             result = new List<string>();
-            string commandCheck;
 
-            ParseCommand(command, out string methodName, out string[] parameters);
+            ParseCommand(command, out string commandName, out string[] parameters);
 
             #region set parameters
             List<object> parametersList = new List<object>();
@@ -72,37 +71,94 @@ namespace Dada.Commander.Core
             object[] parametersArray = parametersList.Count != 0 ? parametersList.ToArray() : null;
             #endregion
 
-            foreach (var cahsedType in cashedTypes)
+            Func<CashedType, MemberInfo> _GetMember = (t) =>
             {
-                foreach (var method in cahsedType.methods)
+                var member = t.GetMembers().FirstOrDefault(
+                    m => GetCommandName(m) == commandName);
+
+                return member;
+            };
+
+            foreach (var type in cashedTypes)
+            {
+                var member = _GetMember(type);
+                if (member != null)
                 {
-                    commandCheck = GetCommandName(method);
-                    if (methodName == commandCheck)
+                    bool successInvoke = false;
+                    match = true;
+                    if (member is MethodInfo method)
                     {
-                        bool successInvoke = false;
-                        match = true;
                         if (!method.IsStatic)
                         {
-                            UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(cahsedType.type);
+                            UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(type.type);
                             if (objType != null)
                             {
                                 successInvoke = InvokeMethod(method, ref result, objType, parametersArray);
                             }
                             else
                             {
-                                result.Add($"<color={errorColor}>Object {cahsedType} is don`t exist</color>");
+                                result.Add($"<color={errorColor}>Object {type} is don`t exist</color>");
                                 return;
                             }
                         }
                         else
                         {
-                            successInvoke = InvokeMethod(method, ref result, cahsedType, parametersArray);
+                            successInvoke = InvokeMethod(method, ref result, type, parametersArray);
                         }
-                        if (successInvoke)
+                    }
+                    else if (member is PropertyInfo property)
+                    {
+                        MethodInfo p_method = null;
+                        MethodInfo p_set_method = property.GetSetMethod();
+                        MethodInfo p_get_method = property.GetGetMethod();
+                        if (p_set_method != null && parametersArray != null) p_method = p_set_method;
+                        else if (p_get_method != null) p_method = p_get_method;
+
+                        if (p_method != null)
                         {
-                            string logResult = method.GetCustomAttribute<ConsoleCommandAttribute>().logResult;
-                            if (logResult != "") result.Add(logResult);
+                            if (!p_method.IsStatic)
+                            {
+                                UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(type.type);
+                                if (objType != null)
+                                {
+                                    successInvoke = InvokeMethod(p_method, ref result, objType, parametersArray);
+                                }
+                                else
+                                {
+                                    result.Add($"<color={errorColor}>Object {type} is don`t exist</color>");
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                successInvoke = InvokeMethod(p_method, ref result, type, parametersArray);
+                            }
                         }
+                    }
+                    else if (member is FieldInfo field)
+                    {
+                        if (!field.IsStatic)
+                        {
+                            UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(type.type);
+                            if (objType != null)
+                            {
+                                successInvoke = ApplyFieldValue(field, ref result, objType, parametersArray);
+                            }
+                            else
+                            {
+                                result.Add($"<color={errorColor}>Object {type} is don`t exist</color>");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            successInvoke = ApplyFieldValue(field, ref result, type, parametersArray);
+                        }
+                    }
+                    if (successInvoke)
+                    {
+                        string logResult = member.GetCustomAttribute<ConsoleCommandAttribute>().logResult;
+                        if (logResult != "") result.Add(logResult);
                     }
                 }
             }
@@ -115,11 +171,11 @@ namespace Dada.Commander.Core
         bool InvokeMethod(MethodInfo method, ref List<string> result, object obj, object[] parameters)
         {
             ParameterInfo[] parameterInfo = method.GetParameters();
-            if(parameters != null)
+            if (parameters != null)
             {
                 if (parameters.Length != parameterInfo.Length)
                 {
-                    result = new List<string>() { $"<color={errorColor}>method has not this parameters</color>" };
+                    result = new List<string>() { $"<color={errorColor}>incorrect number of parameters</color>" };
                     return false;
                 }
                 for (int i = 0; i < parameters.Length; i++)
@@ -129,7 +185,7 @@ namespace Dada.Commander.Core
                         if (!(System.Object.ReferenceEquals(parameters[i].GetType(), typeof(int)) &&
                             System.Object.ReferenceEquals(parameterInfo[i].ParameterType, typeof(float))))
                         {
-                            result = new List<string>() { $"<color={errorColor}>method has not this parameters</color>" };
+                            result = new List<string>() { $"<color={errorColor}>incorrect parameter type</color>" };
                             return false;
                         }
                     }
@@ -138,7 +194,7 @@ namespace Dada.Commander.Core
             else if (parameters == null && parameterInfo.Length != 0)
             {
                 result = new List<string>() { $"<color={errorColor}>method needs parameters:</color> \n" };
-                foreach(ParameterInfo info in parameterInfo)
+                foreach (ParameterInfo info in parameterInfo)
                 {
                     result[0] += $"<color={textColor}>{info.Position + 1}: ({info.ParameterType}) {info.Name}</color>";
                     if (info.Position + 1 != parameterInfo.Length) result[0] += '\n';
@@ -174,9 +230,46 @@ namespace Dada.Commander.Core
             result = new List<string>() { $"<color={errorColor}>method has unsupported return value</color>" };
             return false;
         }
-        void ParseCommand(string command, out string methodName, out string[] parameters)
+        bool ApplyFieldValue(FieldInfo field, ref List<string> result, object obj, object[] parameters)
         {
-            methodName = null;
+            object parameter = null;
+            if (parameters != null )
+            {
+                if (parameters.Count() != 1)
+                {
+                    result = new List<string>() { $"<color={errorColor}>too much values</color>" };
+                    return false;
+                }
+                else
+                {
+                    parameter = parameters[0];
+                }
+            }
+            if (parameter == null)
+            {
+                object fielValue = field.GetValue(obj);
+                string str_fieldValue = fielValue != null ? fielValue.ToString() : "null";
+                result.Add($"{field.Name} = {str_fieldValue}");
+                return true;
+            }
+            else
+            {
+                if (!System.Object.ReferenceEquals(field.FieldType, parameter.GetType()))
+                {
+                    if (!(System.Object.ReferenceEquals(parameter.GetType(), typeof(int)) &&
+                        System.Object.ReferenceEquals(field.FieldType, typeof(float))))
+                    {
+                        result = new List<string>() { $"<color={errorColor}>incorrect type for this field</color>" };
+                        return false;
+                    }
+                }
+                field.SetValue(obj, parameter);
+                return true;
+            }
+        }
+        void ParseCommand(string command, out string commandName, out string[] parameters)
+        {
+            commandName = null;
             parameters = null;
             int coincidenceCount = 0;
             string currenCommand = null;
@@ -186,7 +279,7 @@ namespace Dada.Commander.Core
                 {
                     if (_cmd.Length == command.Length)
                     {
-                        methodName = _cmd;
+                        commandName = _cmd;
                         return;
                     }
                     if (_cmd.Length > coincidenceCount)
@@ -197,11 +290,11 @@ namespace Dada.Commander.Core
                 }
             }
             if (currenCommand == null) return;
-            methodName = currenCommand;
-            command = command.Remove(0, methodName.Length);
+            commandName = currenCommand;
+            command = command.Remove(0, commandName.Length);
             if (command[0] != ' ')
             {
-                methodName = null;
+                commandName = null;
                 return;
             }
             parameters = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -260,15 +353,16 @@ namespace Dada.Commander.Core
             List<string> _cmds = new List<string>();
             foreach (CashedType cashedType in cashedTypes)
             {
-                foreach (MethodInfo method in cashedType.methods)
+                var members = cashedType.GetMembers();
+                foreach (MemberInfo member in members)
                 {
-                    if ((method.GetCustomAttribute<ConsoleCommandAttribute>().commandFlag & commandFlags) == 0) continue;
-                    string str = method.GetCustomAttribute<ConsoleCommandAttribute>().commandName;
-                    if (str == "") str = method.Name;
+                    if ((member.GetCustomAttribute<ConsoleCommandAttribute>().commandFlag & commandFlags) == 0) continue;
+                    string str = member.GetCustomAttribute<ConsoleCommandAttribute>().commandName;
+                    if (str == "") str = member.Name;
                     str = $"<color={textColor}>{str}</color>";
                     if (showDescription)
                     {
-                        string _description = method.GetCustomAttribute<ConsoleCommandAttribute>().description;
+                        string _description = member.GetCustomAttribute<ConsoleCommandAttribute>().description;
                         if (_description != "") str += $"<color={textColor}> - {_description}</color>";
                     }
                     _cmds.Add(str);
@@ -276,11 +370,11 @@ namespace Dada.Commander.Core
             }
             return _cmds;
         }
-        string GetCommandName(MethodInfo method)
+        string GetCommandName(MemberInfo member)
         {
-            return method.GetCustomAttribute<ConsoleCommandAttribute>().commandName != "" ?
-                        method.GetCustomAttribute<ConsoleCommandAttribute>().commandName :
-                        method.Name;
+            return member.GetCustomAttribute<ConsoleCommandAttribute>().commandName != "" ?
+                        member.GetCustomAttribute<ConsoleCommandAttribute>().commandName :
+                        member.Name;
         }
 
         void Initialize()
@@ -308,12 +402,31 @@ namespace Dada.Commander.Core
                 {
                     var methods = type.GetMethods(flags).
                         Where(m => m.GetCustomAttributes<ConsoleCommandAttribute>().Count() > 0);
-                    if (methods.Count() == 0) continue;
-                    cashedTypes.Add(new CashedType(type, methods));
-                    foreach (var method in methods)
+
+                    var properties = type.GetProperties(flags).
+                        Where((m) => m.GetCustomAttributes<ConsoleCommandAttribute>().Count() > 0);
+
+                    var fields = type.GetFields(flags).
+                        Where((m) => m.GetCustomAttributes<ConsoleCommandAttribute>().Count() > 0);
+
+                    if (methods.Count() != 0 || properties.Count() != 0 || fields.Count() != 0)
                     {
-                        commands.Add(GetCommandName(method));
-                        commandsDescriptions.Add(method.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                        cashedTypes.Add(new CashedType(type, methods, properties, fields));
+                        foreach (var method in methods)
+                        {
+                            commands.Add(GetCommandName(method));
+                            commandsDescriptions.Add(method.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                        }
+                        foreach (var property in properties)
+                        {
+                            commands.Add(GetCommandName(property));
+                            commandsDescriptions.Add(property.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                        }
+                        foreach (var field in fields)
+                        {
+                            commands.Add(GetCommandName(field));
+                            commandsDescriptions.Add(field.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                        }
                     }
                 }
             }
@@ -323,11 +436,24 @@ namespace Dada.Commander.Core
         {
             public Type type;
             public IEnumerable<MethodInfo> methods;
+            public IEnumerable<PropertyInfo> properties;
+            public IEnumerable<FieldInfo> fields;
 
-            public CashedType(Type type, IEnumerable<MethodInfo> methods)
+            public CashedType(Type type, IEnumerable<MethodInfo> methods, IEnumerable<PropertyInfo> properties, IEnumerable<FieldInfo> fields)
             {
                 this.type = type;
                 this.methods = methods;
+                this.properties = properties;
+                this.fields = fields;
+            }
+
+            public MemberInfo[] GetMembers()
+            {
+                var members = methods.Select((m) => m as MemberInfo).ToList();
+                members.AddRange(properties.Select((p) => p as MemberInfo).ToList());
+                members.AddRange(fields.Select((f) => f as MemberInfo).ToList());
+
+                return members.ToArray();
             }
         }
     }

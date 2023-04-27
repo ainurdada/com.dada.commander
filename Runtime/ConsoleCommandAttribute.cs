@@ -2,7 +2,7 @@
 
 namespace Dada.Commander
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
     public class ConsoleCommandAttribute : Attribute
     {
         public string commandName = "";
