@@ -34,6 +34,9 @@ namespace Dada.Commander.Core
         public string textColor = "white";
         public string errorColor = "red";
 
+        bool choosing = false;
+        List<SavedMember> savedMembers = new List<SavedMember>();
+
         /// <summary>
         /// Apply the command and get the log result
         /// </summary>
@@ -41,125 +44,205 @@ namespace Dada.Commander.Core
         /// <param name="result"></param>
         public void ApplyCommand(string command, out List<string> result)
         {
-            bool match = false;
             result = new List<string>();
-
-            ParseCommand(command, out string commandName, out string[] parameters);
-
-            #region set parameters
-            List<object> parametersList = new List<object>();
-            string parametersString = "";
-            if (parameters != null)
+            bool match = false;
+            SavedMember targetMember = null;
+            if (choosing)
             {
-                foreach (string param in parameters)
+                if (int.TryParse(command, out int index))
                 {
-                    if (int.TryParse(param, out int resInt))
+                    if (index >= savedMembers.Count() || index < 0)
                     {
-                        parametersList.Add(resInt);
+                        result = new() { $"<color={errorColor}>incorrect index: enter a number from {0} to {savedMembers.Count() - 1}</color>" };
+                        return;
                     }
-                    else if (float.TryParse(param, out float resFloat))
+                    targetMember = savedMembers[index];
+                }
+                else choosing = false;
+            }
+            List<object> parametersArray = new List<object>();
+
+            if (!choosing)
+            {
+                ParseCommand(command, out string commandName, out string[] parameters);
+
+                #region set parameters
+                List<object> parametersList = new List<object>();
+                string parametersString = "";
+                if (parameters != null)
+                {
+                    foreach (string param in parameters)
                     {
-                        parametersList.Add(resFloat);
+                        if (int.TryParse(param, out int resInt))
+                        {
+                            parametersList.Add(resInt);
+                        }
+                        else if (float.TryParse(param, out float resFloat))
+                        {
+                            parametersList.Add(resFloat);
+                        }
+                        else
+                        {
+                            parametersList.Add(param);
+                        }
+                        parametersString += $"{param} ";
+                    }
+                }
+                parametersArray = parametersList.Count != 0 ? parametersList : null;
+                #endregion
+
+                Func<CashedType, MemberInfo> _GetMember = (t) =>
+                {
+                    var member = t.GetMembers().FirstOrDefault(
+                        m => GetCommandName(m) == commandName);
+
+                    return member;
+                };
+
+                var relevantMembers = cashedTypes.Select(_GetMember).Where(m => m != null);
+                if (relevantMembers.Count() > 1)
+                {
+                    savedMembers.Clear();
+                    choosing = true;
+                    result.Add($"<color={textColor}>select target:</color>");
+                    int index = 0;
+                    foreach (var member in relevantMembers)
+                    {
+                        if (member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed)
+                        {
+                            result.Add($"<color={textColor}>{index++}: static class {member.ReflectedType.Name}</color>");
+                            savedMembers.Add(new SavedMember(member, member.ReflectedType, parametersArray?.ToArray()));
+                            continue;
+                        }
+                        UnityEngine.Object[] objTypes = UnityEngine.Object.FindObjectsByType(member.ReflectedType, FindObjectsSortMode.InstanceID);
+                        foreach (var instance in objTypes)
+                        {
+                            result.Add($"<color={textColor}>{index++}: object {instance.name}</color>");
+                            savedMembers.Add(new SavedMember(member, instance, parametersArray?.ToArray()));
+                        }
+                    }
+                    if(index == 0)
+                    {
+                        result = new() { $"<color={errorColor}>this command needs for instance</color>" };
+                        choosing = false;
+                    }
+                    return;
+                }
+                else if(relevantMembers.Count() == 1)
+                {
+                    MemberInfo member = relevantMembers.First();
+                    if (member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed)
+                    {
+                        targetMember = new SavedMember(member, member.ReflectedType, parametersArray?.ToArray());
                     }
                     else
                     {
-                        parametersList.Add(param);
+                        UnityEngine.Object[] objects = UnityEngine.Object.FindObjectsByType(member.ReflectedType, FindObjectsSortMode.InstanceID);
+                        if (objects.Length == 1)
+                        {
+                            targetMember = new SavedMember(member, objects[0], parametersArray?.ToArray());
+                        }
+                        else if (objects.Length == 0)
+                        {
+                            result = new() { $"<color={errorColor}>this command needs for instance</color>" };
+                            return;
+                        }
+                        else
+                        {
+                            int index = 0;
+                            savedMembers.Clear();
+                            foreach (var instance in objects)
+                            {
+                                result.Add($"<color={textColor}>{index++}: object {instance.name}</color>");
+                                savedMembers.Add(new SavedMember(member, instance, parametersArray?.ToArray()));
+                            }
+                            choosing = true;
+                            return;
+                        }
                     }
-                    parametersString += $"{param} ";
+                }
+                else
+                {
+                    result = new() { $"<color={errorColor}>incorrect command</color>" };
+                    return;
                 }
             }
-            object[] parametersArray = parametersList.Count != 0 ? parametersList.ToArray() : null;
-            #endregion
+            choosing = false;
 
-            Func<CashedType, MemberInfo> _GetMember = (t) =>
+            if (targetMember != null)
             {
-                var member = t.GetMembers().FirstOrDefault(
-                    m => GetCommandName(m) == commandName);
-
-                return member;
-            };
-
-            foreach (var type in cashedTypes)
-            {
-                var member = _GetMember(type);
-                if (member != null)
+                bool successInvoke = false;
+                match = true;
+                if (targetMember.member is MethodInfo method)
                 {
-                    bool successInvoke = false;
-                    match = true;
-                    if (member is MethodInfo method)
+                    if (!targetMember.isStatic)
                     {
-                        if (!method.IsStatic)
+                        if (targetMember.u_object != null)
                         {
-                            UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(type.type);
-                            if (objType != null)
-                            {
-                                successInvoke = InvokeMethod(method, ref result, objType, parametersArray);
-                            }
-                            else
-                            {
-                                result.Add($"<color={errorColor}>Object {type} is don`t exist</color>");
-                                return;
-                            }
+                            successInvoke = InvokeMethod(method, ref result, targetMember.u_object, targetMember.parameters);
                         }
                         else
                         {
-                            successInvoke = InvokeMethod(method, ref result, type, parametersArray);
+                            result.Add($"<color={errorColor}>Object {targetMember.u_object} is don`t exist</color>");
+                            return;
                         }
                     }
-                    else if (member is PropertyInfo property)
+                    else
                     {
-                        MethodInfo p_method = null;
-                        MethodInfo p_set_method = property.GetSetMethod();
-                        MethodInfo p_get_method = property.GetGetMethod();
-                        if (p_set_method != null && parametersArray != null) p_method = p_set_method;
-                        else if (p_get_method != null) p_method = p_get_method;
+                        successInvoke = InvokeMethod(method, ref result, targetMember.type, targetMember.parameters);
+                    }
+                }
+                else if (targetMember.member is PropertyInfo property)
+                {
+                    MethodInfo p_method = null;
+                    MethodInfo p_set_method = property.GetSetMethod();
+                    MethodInfo p_get_method = property.GetGetMethod();
+                    if (p_set_method != null && parametersArray != null) p_method = p_set_method;
+                    else if (p_get_method != null) p_method = p_get_method;
 
-                        if (p_method != null)
-                        {
-                            if (!p_method.IsStatic)
-                            {
-                                UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(type.type);
-                                if (objType != null)
-                                {
-                                    successInvoke = InvokeMethod(p_method, ref result, objType, parametersArray);
-                                }
-                                else
-                                {
-                                    result.Add($"<color={errorColor}>Object {type} is don`t exist</color>");
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                successInvoke = InvokeMethod(p_method, ref result, type, parametersArray);
-                            }
-                        }
-                    }
-                    else if (member is FieldInfo field)
+                    if (p_method != null)
                     {
-                        if (!field.IsStatic)
+                        if (!targetMember.isStatic)
                         {
-                            UnityEngine.Object objType = UnityEngine.Object.FindFirstObjectByType(type.type);
-                            if (objType != null)
+                            if (targetMember.u_object != null)
                             {
-                                successInvoke = ApplyFieldValue(field, ref result, objType, parametersArray);
+                                successInvoke = InvokeMethod(p_method, ref result, targetMember.u_object, targetMember.parameters);
                             }
                             else
                             {
-                                result.Add($"<color={errorColor}>Object {type} is don`t exist</color>");
+                                result.Add($"<color={errorColor}>Object {targetMember.u_object} is don`t exist</color>");
                                 return;
                             }
                         }
                         else
                         {
-                            successInvoke = ApplyFieldValue(field, ref result, type, parametersArray);
+                            successInvoke = InvokeMethod(p_method, ref result, targetMember.type, targetMember.parameters);
                         }
                     }
-                    if (successInvoke)
+                }
+                else if (targetMember.member is FieldInfo field)
+                {
+                    if (!field.IsStatic)
                     {
-                        string logResult = member.GetCustomAttribute<ConsoleCommandAttribute>().logResult;
-                        if (logResult != "") result.Add(logResult);
+                        if (targetMember.u_object != null)
+                        {
+                            successInvoke = ApplyFieldValue(field, ref result, targetMember.u_object, targetMember.parameters);
+                        }
+                        else
+                        {
+                            result.Add($"<color={errorColor}>Object {targetMember.u_object} is don`t exist</color>");
+                            return;
+                        }
                     }
+                    else
+                    {
+                        successInvoke = ApplyFieldValue(field, ref result, targetMember.type, targetMember.parameters);
+                    }
+                }
+                if (successInvoke)
+                {
+                    string logResult = targetMember.member.GetCustomAttribute<ConsoleCommandAttribute>().logResult;
+                    if (logResult != "") result.Add(logResult);
                 }
             }
             if (!match)
@@ -201,39 +284,43 @@ namespace Dada.Commander.Core
                 }
                 return false;
             }
-            if (method.ReturnType == typeof(void))
+            ParseReturnValue(method.Invoke(obj, parameters), ref result);
+            return true;
+        }
+        void ParseReturnValue(object returnValue, ref List<string> result)
+        {
+            if (returnValue == null)
             {
-                method.Invoke(obj, parameters);
-                return true;
+                return;
             }
-            if (method.ReturnType == typeof(string))
+            if (returnValue is System.Array)
             {
-                result.Add($"<color={textColor}>{method.Invoke(obj, parameters) as string}</color>");
-                return true;
+                int index = 0;
+                foreach (object str in returnValue as System.Array)
+                {
+                    result.Add($"<color={textColor}>{index++}: {str}</color>");
+                }
+                return;
             }
-            if (method.ReturnType == typeof(List<string>))
+
+            if (returnValue is IEnumerable<object>)
             {
-                foreach (string str in method.Invoke(obj, parameters) as List<string>)
+                foreach (object str in returnValue as IEnumerable<object>)
                 {
                     result.Add($"<color={textColor}>{str}</color>");
                 }
-                return true;
+                return;
             }
-            if (method.ReturnType == typeof(string[]))
+            else
             {
-                foreach (string str in method.Invoke(obj, parameters) as string[])
-                {
-                    result.Add($"<color={textColor}>{str}</color>");
-                }
-                return true;
+                result.Add($"<color={textColor}>{returnValue}</color>");
+                return;
             }
-            result = new List<string>() { $"<color={errorColor}>method has unsupported return value</color>" };
-            return false;
         }
         bool ApplyFieldValue(FieldInfo field, ref List<string> result, object obj, object[] parameters)
         {
             object parameter = null;
-            if (parameters != null )
+            if (parameters != null)
             {
                 if (parameters.Count() != 1)
                 {
@@ -455,6 +542,28 @@ namespace Dada.Commander.Core
                 members.AddRange(fields.Select((f) => f as MemberInfo).ToList());
 
                 return members.ToArray();
+            }
+        }
+        private class SavedMember
+        {
+            public MemberInfo member;
+            public readonly bool isStatic;
+            public UnityEngine.Object u_object;
+            public Type type;
+            public object[] parameters;
+            public SavedMember(MemberInfo member, Type type, object[] parameters)
+            {
+                this.member = member;
+                this.isStatic = true;
+                this.type = type;
+                this.parameters = parameters;
+            }
+            public SavedMember(MemberInfo member, UnityEngine.Object u_object, object[] parameters)
+            {
+                this.member = member;
+                this.isStatic = false;
+                this.u_object = u_object;
+                this.parameters = parameters;
             }
         }
     }
