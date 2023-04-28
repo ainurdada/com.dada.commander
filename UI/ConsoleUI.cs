@@ -1,14 +1,14 @@
 using Dada.Commander;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Dada.Commander.Ui
 {
+    [ExecuteAlways]
     internal class ConsoleUI : MonoBehaviour
     {
         [SerializeField] CanvasGroup canvasGroup;
@@ -18,21 +18,27 @@ namespace Dada.Commander.Ui
         [Space]
         public Image logBackground;
         public Image inputBackGround;
+        [Space]
+        public Dada.Commander.Ui.Preview preview;
 
         #region Instance
         static ConsoleUI instance;
+        static ConsoleUI editorInstance;
         public static ConsoleUI Instance
         {
             get
             {
-                return instance;
+                if (Application.isPlaying)
+                    return instance;
+
+                return editorInstance;
             }
         }
         #endregion
 
         TextMeshProUGUI logText;
 
-        [HideInInspector] public bool hideAtTheBeginning= true;
+        [HideInInspector] public bool hideAtTheBeginning = true;
 
         [HideInInspector] public string cmdColor = "#fff";
         [HideInInspector] public string commandPrefix = ">";
@@ -42,14 +48,27 @@ namespace Dada.Commander.Ui
 
         private void Awake()
         {
-            instance = this;
+            if (Application.IsPlaying(gameObject))
+            {
+                instance = this;
 
-            inputField.onSubmit.AddListener(EnterCommand);
-            inputField.onValueChanged.AddListener(WriteHelper);
-            logText = logContent.GetComponent<TextMeshProUGUI>();
-            logText.text = "";
-            logContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
-            StartCoroutine(FirstFrame());
+                inputField.onSubmit.AddListener(EnterCommand);
+                inputField.onValueChanged.AddListener(WriteHelper);
+                logText = logContent.GetComponent<TextMeshProUGUI>();
+                logText.text = "";
+                logContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+                StartCoroutine(FirstFrame());
+                Destroy(preview.gameObject);
+            }
+            else
+            {
+                SerializedObject serialized = new SerializedObject(this);
+                if (editorInstance != null)
+                {
+                    DestroyImmediate(editorInstance);
+                }
+                editorInstance = this;
+            }
         }
 
         private IEnumerator FirstFrame()
@@ -68,13 +87,15 @@ namespace Dada.Commander.Ui
             Commander.ApplyCommand(command, out List<string> result);
 
             AddLog(result.ToArray());
+            inputField.ActivateInputField();
         }
 
         public void FillAuto()
         {
             if (isShowed)
             {
-                inputField.text = Commander.GetSimilarCommand(inputField.text);
+                string str = Commander.GetSimilarCommand(inputField.text);
+                inputField.text = str != null ? str : inputField.text;
                 inputField.MoveToEndOfLine(false, false);
             }
         }
@@ -107,6 +128,7 @@ namespace Dada.Commander.Ui
 
         public void Show()
         {
+            inputField.ActivateInputField();
             canvasGroup.alpha = 1;
             canvasGroup.blocksRaycasts = true;
             isShowed = true;
@@ -114,6 +136,7 @@ namespace Dada.Commander.Ui
 
         public void Hide()
         {
+            inputField.DeactivateInputField();
             canvasGroup.alpha = 0;
             canvasGroup.blocksRaycasts = false;
             isShowed = false;

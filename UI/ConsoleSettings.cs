@@ -1,8 +1,7 @@
 using Dada.Commander.Core;
 using System;
-using System.Collections;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Dada.Commander.Ui
 {
@@ -98,10 +97,21 @@ namespace Dada.Commander.Ui
         }
         #endregion
 
+#if UNITY_EDITOR
+        public void OnValidate()
+        {
+            if (!gameObject.activeInHierarchy || !gameObject.activeSelf)
+                return;
+
+            if (gameObject.scene.name.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name))
+            {
+                ApplyChanges();
+            }
+        }
+#endif
         private void Start()
         {
             instance = this;
-
             HideAtTheStart = hideAtTheStart;
 
             LogBackgroundColor = logBackgroundColor;
@@ -111,6 +121,23 @@ namespace Dada.Commander.Ui
             LogColor = logResult.logColor;
             LogErrorColor = logResult.logErrorColor;
             PrefixColor = commandLog.prefixColor;
+        }
+
+        void ApplyChanges()
+        {
+            if (ConsoleUI.Instance != null)
+            {
+                ConsoleUI.Instance.logBackground.color = logBackgroundColor;
+                ConsoleUI.Instance.inputBackGround.color = inputBackgroundColor;
+
+                ConsoleUI.Instance.preview.CommandText = "command";
+                ConsoleUI.Instance.preview.CommandColor = commandLog.commandColor;
+                ConsoleUI.Instance.preview.PrefixText = commandLog.commandPrefix;
+                ConsoleUI.Instance.preview.PrefixColor = commandLog.prefixColor;
+
+                ConsoleUI.Instance.preview.SetCommonColor(LogColor);
+                ConsoleUI.Instance.preview.SetErrorColor(LogErrorColor);
+            }
         }
 
         [Serializable]
