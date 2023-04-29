@@ -1,4 +1,5 @@
 using Dada.Commander;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -43,6 +44,9 @@ namespace Dada.Commander.Ui
         [HideInInspector] public string cmdColor = "#fff";
         [HideInInspector] public string commandPrefix = ">";
         [HideInInspector] public string prefixColor = "fff";
+
+        [HideInInspector] public event Action OnShowed;
+        [HideInInspector] public event Action OnHided;
 
         bool isShowed;
 
@@ -132,6 +136,7 @@ namespace Dada.Commander.Ui
             canvasGroup.alpha = 1;
             canvasGroup.blocksRaycasts = true;
             isShowed = true;
+            OnShowed?.Invoke();
         }
 
         public void Hide()
@@ -140,6 +145,7 @@ namespace Dada.Commander.Ui
             canvasGroup.alpha = 0;
             canvasGroup.blocksRaycasts = false;
             isShowed = false;
+            OnHided?.Invoke();
         }
 
         [ConsoleCommand(commandName = "clear",

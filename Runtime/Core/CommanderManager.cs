@@ -8,8 +8,6 @@ namespace Dada.Commander.Core
 {
     internal class CommanderManager
     {
-        public static string[] fileNames = { "Assets" };
-
         #region Instance
         static CommanderManager instance;
         public static CommanderManager Instance
@@ -26,10 +24,10 @@ namespace Dada.Commander.Core
         }
         #endregion
 
-        public List<string> commands = new List<string>();
-        public List<string> commandsDescriptions = new List<string>();
+        public string[] commands;
+        public string[] commandsDescriptions;
 
-        List<CashedType> cashedTypes = new List<CashedType>();
+        CashedType[] cashedTypes;
 
         public string textColor = "white";
         public string errorColor = "red";
@@ -53,7 +51,7 @@ namespace Dada.Commander.Core
                 {
                     if (index >= savedMembers.Count() || index < 0)
                     {
-                        result = new() { $"<color={errorColor}>incorrect index: enter a number from {0} to {savedMembers.Count() - 1}</color>" };
+                        result = new() { ($"incorrect index: enter a number from {0} to {savedMembers.Count() - 1}").SetColor(errorColor) };
                         return;
                     }
                     targetMember = savedMembers[index];
@@ -104,31 +102,31 @@ namespace Dada.Commander.Core
                 {
                     savedMembers.Clear();
                     choosing = true;
-                    result.Add($"<color={textColor}>select target:</color>");
+                    result.Add($"select target:".SetColor(textColor));
                     int index = 0;
                     foreach (var member in relevantMembers)
                     {
                         if (member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed)
                         {
-                            result.Add($"<color={textColor}>{index++}: static class {member.ReflectedType.Name}</color>");
+                            result.Add($"{index++}: static class {member.ReflectedType.Name}".SetColor(textColor));
                             savedMembers.Add(new SavedMember(member, member.ReflectedType, parametersArray?.ToArray()));
                             continue;
                         }
                         UnityEngine.Object[] objTypes = UnityEngine.Object.FindObjectsByType(member.ReflectedType, FindObjectsSortMode.InstanceID);
                         foreach (var instance in objTypes)
                         {
-                            result.Add($"<color={textColor}>{index++}: object {instance.name}</color>");
+                            result.Add($"{index++}: object {instance.name}".SetColor(textColor));
                             savedMembers.Add(new SavedMember(member, instance, parametersArray?.ToArray()));
                         }
                     }
-                    if(index == 0)
+                    if (index == 0)
                     {
-                        result = new() { $"<color={errorColor}>this command needs for instance</color>" };
+                        result = new() { "this command needs for instance".SetColor(errorColor) };
                         choosing = false;
                     }
                     return;
                 }
-                else if(relevantMembers.Count() == 1)
+                else if (relevantMembers.Count() == 1)
                 {
                     MemberInfo member = relevantMembers.First();
                     if (member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed)
@@ -144,7 +142,7 @@ namespace Dada.Commander.Core
                         }
                         else if (objects.Length == 0)
                         {
-                            result = new() { $"<color={errorColor}>this command needs for instance</color>" };
+                            result = new() { "this command needs for instance".SetColor(errorColor) };
                             return;
                         }
                         else
@@ -153,7 +151,7 @@ namespace Dada.Commander.Core
                             savedMembers.Clear();
                             foreach (var instance in objects)
                             {
-                                result.Add($"<color={textColor}>{index++}: object {instance.name}</color>");
+                                result.Add($"{index++}: object {instance.name}".SetColor(textColor));
                                 savedMembers.Add(new SavedMember(member, instance, parametersArray?.ToArray()));
                             }
                             choosing = true;
@@ -163,7 +161,7 @@ namespace Dada.Commander.Core
                 }
                 else
                 {
-                    result = new() { $"<color={errorColor}>incorrect command</color>" };
+                    result = new() { "incorrect command".SetColor(errorColor) };
                     return;
                 }
             }
@@ -183,7 +181,7 @@ namespace Dada.Commander.Core
                         }
                         else
                         {
-                            result.Add($"<color={errorColor}>Object {targetMember.u_object} is don`t exist</color>");
+                            result.Add($"Object {targetMember.u_object} is don`t exist".SetColor(errorColor));
                             return;
                         }
                     }
@@ -210,7 +208,7 @@ namespace Dada.Commander.Core
                             }
                             else
                             {
-                                result.Add($"<color={errorColor}>Object {targetMember.u_object} is don`t exist</color>");
+                                result.Add($"Object {targetMember.u_object} is don`t exist".SetColor(errorColor));
                                 return;
                             }
                         }
@@ -230,7 +228,7 @@ namespace Dada.Commander.Core
                         }
                         else
                         {
-                            result.Add($"<color={errorColor}>Object {targetMember.u_object} is don`t exist</color>");
+                            result.Add($"Object {targetMember.u_object} is don`t exist".SetColor(errorColor));
                             return;
                         }
                     }
@@ -248,7 +246,7 @@ namespace Dada.Commander.Core
             if (!match)
             {
                 result.Clear();
-                result.Add($"<color={errorColor}>this command not exist</color>");
+                result.Add("this command not exist".SetColor(errorColor));
             }
         }
         bool InvokeMethod(MethodInfo method, ref List<string> result, object obj, object[] parameters)
@@ -258,7 +256,7 @@ namespace Dada.Commander.Core
             {
                 if (parameters.Length != parameterInfo.Length)
                 {
-                    result = new List<string>() { $"<color={errorColor}>incorrect number of parameters</color>" };
+                    result = new List<string>() { $"incorrect number of parameters".SetColor(errorColor) };
                     return false;
                 }
                 for (int i = 0; i < parameters.Length; i++)
@@ -268,7 +266,7 @@ namespace Dada.Commander.Core
                         if (!(System.Object.ReferenceEquals(parameters[i].GetType(), typeof(int)) &&
                             System.Object.ReferenceEquals(parameterInfo[i].ParameterType, typeof(float))))
                         {
-                            result = new List<string>() { $"<color={errorColor}>incorrect parameter type</color>" };
+                            result = new List<string>() { "incorrect parameter type".SetColor(errorColor) };
                             return false;
                         }
                     }
@@ -276,10 +274,10 @@ namespace Dada.Commander.Core
             }
             else if (parameters == null && parameterInfo.Length != 0)
             {
-                result = new List<string>() { $"<color={errorColor}>method needs parameters:</color> \n" };
+                result = new List<string>() { "method needs parameters:".SetColor(errorColor) + "\n" };
                 foreach (ParameterInfo info in parameterInfo)
                 {
-                    result[0] += $"<color={textColor}>{info.Position + 1}: ({info.ParameterType}) {info.Name}</color>";
+                    result[0] += $"{info.Position + 1}: ({info.ParameterType}) {info.Name}".SetColor(textColor);
                     if (info.Position + 1 != parameterInfo.Length) result[0] += '\n';
                 }
                 return false;
@@ -298,22 +296,21 @@ namespace Dada.Commander.Core
                 int index = 0;
                 foreach (object str in returnValue as System.Array)
                 {
-                    result.Add($"<color={textColor}>{index++}: {str}</color>");
+                    result.Add($"{index++}: {str}".SetColor(textColor));
                 }
                 return;
             }
-
             if (returnValue is IEnumerable<object>)
             {
                 foreach (object str in returnValue as IEnumerable<object>)
                 {
-                    result.Add($"<color={textColor}>{str}</color>");
+                    result.Add(str.ToString().SetColor(textColor));
                 }
                 return;
             }
             else
             {
-                result.Add($"<color={textColor}>{returnValue}</color>");
+                result.Add(returnValue.ToString().SetColor(textColor));
                 return;
             }
         }
@@ -324,7 +321,7 @@ namespace Dada.Commander.Core
             {
                 if (parameters.Count() != 1)
                 {
-                    result = new List<string>() { $"<color={errorColor}>too much values</color>" };
+                    result = new List<string>() { "too much values".SetColor(errorColor) };
                     return false;
                 }
                 else
@@ -346,7 +343,7 @@ namespace Dada.Commander.Core
                     if (!(System.Object.ReferenceEquals(parameter.GetType(), typeof(int)) &&
                         System.Object.ReferenceEquals(field.FieldType, typeof(float))))
                     {
-                        result = new List<string>() { $"<color={errorColor}>incorrect type for this field</color>" };
+                        result = new List<string>() { "incorrect type for this field".SetColor(errorColor) };
                         return false;
                     }
                 }
@@ -398,13 +395,10 @@ namespace Dada.Commander.Core
             string resultCommand = null;
             foreach (string cmd in commands)
             {
-                if (cmd.StartsWith(command))
+                if (cmd.StartsWith(command) && cmd.Length < coincidenceCount)
                 {
-                    if (cmd.Length < coincidenceCount)
-                    {
-                        coincidenceCount = cmd.Length;
-                        resultCommand = cmd;
-                    }
+                    coincidenceCount = cmd.Length;
+                    resultCommand = cmd;
                 }
             }
             return resultCommand;
@@ -419,11 +413,11 @@ namespace Dada.Commander.Core
             List<string> types = new List<string>();
             foreach (CashedType cashedType in cashedTypes)
             {
-                string typeInfo = $"<color={textColor}>class {cashedType.type.Name} has {cashedType.methods.Count()} console methods:</color> \n";
-                foreach (MethodInfo method in cashedType.methods)
-                {
-                    typeInfo += $"<color={textColor}>{method.Name}</color> \n";
-                }
+                string typeInfo = $"class {cashedType.type.Name} has {cashedType.GetMembers().Count()} console member(s):".SetColor(textColor) + " \n";
+
+                foreach (MemberInfo member in cashedType.GetMembers())
+                    typeInfo += member.Name.SetColor(textColor) + " \n";
+
                 types.Add(typeInfo);
             }
             return types;
@@ -438,22 +432,19 @@ namespace Dada.Commander.Core
         public List<string> GetCommands(bool showDescription, CommandFlags commandFlags = CommandFlags.all)
         {
             List<string> _cmds = new List<string>();
-            foreach (CashedType cashedType in cashedTypes)
+            var members = cashedTypes.
+                Select(t => t.GetMembers()).
+                SelectMany(mI => mI).
+                Where(m => (m.GetCustomAttribute<ConsoleCommandAttribute>().commandFlag & commandFlags) != 0);
+            foreach (MemberInfo member in members)
             {
-                var members = cashedType.GetMembers();
-                foreach (MemberInfo member in members)
+                string str = GetCommandName(member).SetColor(textColor);
+                if (showDescription)
                 {
-                    if ((member.GetCustomAttribute<ConsoleCommandAttribute>().commandFlag & commandFlags) == 0) continue;
-                    string str = member.GetCustomAttribute<ConsoleCommandAttribute>().commandName;
-                    if (str == "") str = member.Name;
-                    str = $"<color={textColor}>{str}</color>";
-                    if (showDescription)
-                    {
-                        string _description = member.GetCustomAttribute<ConsoleCommandAttribute>().description;
-                        if (_description != "") str += $"<color={textColor}> - {_description}</color>";
-                    }
-                    _cmds.Add(str);
+                    string _description = member.GetCustomAttribute<ConsoleCommandAttribute>().description;
+                    if (_description != "") str += $" - {_description}".SetColor(textColor);
                 }
+                _cmds.Add(str);
             }
             return _cmds;
         }
@@ -467,6 +458,11 @@ namespace Dada.Commander.Core
         void Initialize()
         {
             string appPath = Application.dataPath.Remove(Application.dataPath.Length - 7).Replace('/', '\\');
+
+            List<CashedType> findedTypes = new List<CashedType>();
+            List<string> findedCommands = new List<string>();
+            List<string> findedDescriptions = new List<string>();
+
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies().
                 Where(a => !a.IsDynamic).
@@ -499,25 +495,28 @@ namespace Dada.Commander.Core
 
                     if (methods.Count() != 0 || properties.Count() != 0 || fields.Count() != 0)
                     {
-                        cashedTypes.Add(new CashedType(type, methods, properties, fields));
+                        findedTypes.Add(new CashedType(type, methods, properties, fields));
                         foreach (var method in methods)
                         {
-                            commands.Add(GetCommandName(method));
-                            commandsDescriptions.Add(method.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                            findedCommands.Add(GetCommandName(method));
+                            findedDescriptions.Add(method.GetCustomAttribute<ConsoleCommandAttribute>().description);
                         }
                         foreach (var property in properties)
                         {
-                            commands.Add(GetCommandName(property));
-                            commandsDescriptions.Add(property.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                            findedCommands.Add(GetCommandName(property));
+                            findedDescriptions.Add(property.GetCustomAttribute<ConsoleCommandAttribute>().description);
                         }
                         foreach (var field in fields)
                         {
-                            commands.Add(GetCommandName(field));
-                            commandsDescriptions.Add(field.GetCustomAttribute<ConsoleCommandAttribute>().description);
+                            findedCommands.Add(GetCommandName(field));
+                            findedDescriptions.Add(field.GetCustomAttribute<ConsoleCommandAttribute>().description);
                         }
                     }
                 }
             }
+            cashedTypes = findedTypes.ToArray();
+            commands = findedCommands.ToArray();
+            commandsDescriptions = findedDescriptions.ToArray();
         }
 
         private class CashedType
