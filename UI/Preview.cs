@@ -5,7 +5,7 @@ using TMPro;
 using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 
-namespace Dada.Commander.Ui
+namespace Dada.Commander.UI
 {
     internal class Preview : MonoBehaviour
     {

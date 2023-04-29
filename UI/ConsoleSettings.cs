@@ -3,7 +3,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Dada.Commander.Ui
+namespace Dada.Commander.UI
 {
     public class ConsoleSettings : MonoBehaviour
     {
