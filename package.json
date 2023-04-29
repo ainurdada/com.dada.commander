@@ -1,6 +1,6 @@
 {
     "name": "com.dada.commander",
-    "version": "1.0.0",
+    "version": "1.0.1b",
 
     "displayName": "Commander",
     "description": "Commander is a tool for your Unity game that makes it easy to create cheat commands",

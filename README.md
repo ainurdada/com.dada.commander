@@ -4,7 +4,7 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/Unity-white?style=flat&logo=unity&logoColor=000000">
-<img src="https://img.shields.io/badge/Version-1.0.0-blue">
+<img src="https://img.shields.io/badge/Version-1.0.1b-red">
 <img src="https://img.shields.io/badge/License-MIT-success">
 </p>
 
