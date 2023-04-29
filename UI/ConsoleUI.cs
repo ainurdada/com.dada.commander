@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Dada.Commander.Ui
+namespace Dada.Commander.UI
 {
     [ExecuteAlways]
     internal class ConsoleUI : MonoBehaviour

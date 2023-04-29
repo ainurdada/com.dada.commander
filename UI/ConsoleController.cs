@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Dada.Commander.Ui
+namespace Dada.Commander.UI
 {
     public static class ConsoleController
     {
