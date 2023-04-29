@@ -20,7 +20,7 @@ namespace Dada.Commander.UI
         public Image logBackground;
         public Image inputBackGround;
         [Space]
-        public Dada.Commander.Ui.Preview preview;
+        public Dada.Commander.UI.Preview preview;
 
         #region Instance
         static ConsoleUI instance;
