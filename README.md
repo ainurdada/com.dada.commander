@@ -51,14 +51,14 @@ For using Commanders API you should use namespace ```Dada.Commander```
 ### `Commander` class has next methods:   
 |Method|Parameters|Descripton|
 |------|----------|----------|
-|`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method by his command name and get a log result. <br/> `command` - command name of method <br/> `log` - log result of applying command|
+|`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method or field by his command name and get a log result. <br/> `command` - command name and parameters of class member <br/> `log` - log result of applying command|
 |`GetSimilarCommand`|string `command`|Get the name of the commands that is most similar to the entered `command`|
 |`GetAllConsoleTypes`||Get all class names that have methods with `ConsoleCommand` attribute|
 |`GetCommands`|bool `showDescription`|Get all commands with or without their descriptions|
 |`GetCommands`|bool `showDescription` <br/> CommandFlags `commandFlags`|Get commands with or without their descriptions that has `commandFlags`|
 
 ## Custom flags
-You can create your own custom flag set in `com.dada.cheatconsole\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
+You can create your own custom flag set in `com.dada.commander\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
 
 ## Console UI
 You also can use built-in console UI. It is located on path `...\UI\Prefab`
