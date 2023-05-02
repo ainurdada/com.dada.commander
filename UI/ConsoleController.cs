@@ -9,7 +9,7 @@ namespace Dada.Commander.UI
     public static class ConsoleController
     {
         #region ConsoleUI Events
-        public static event Action onShowed
+        public static event Action OnShowed
         {
             add
             {
@@ -30,7 +30,7 @@ namespace Dada.Commander.UI
                 ConsoleUI.Instance.OnShowed -= value;
             }
         }
-        public static event Action onHided
+        public static event Action OnHided
         {
             add
             {
