@@ -446,6 +446,7 @@ namespace Dada.Commander.Core
                 }
                 _cmds.Add(str);
             }
+            _cmds.Sort();
             return _cmds;
         }
         string GetCommandName(MemberInfo member)
