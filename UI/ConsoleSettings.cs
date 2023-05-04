@@ -1,5 +1,6 @@
 using Dada.Commander.Core;
 using System;
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
@@ -109,8 +110,9 @@ namespace Dada.Commander.UI
             }
         }
 #endif
-        private void Start()
+        private IEnumerator Start()
         {
+            yield return new WaitForEndOfFrame();
             instance = this;
             HideAtTheStart = hideAtTheStart;
 
