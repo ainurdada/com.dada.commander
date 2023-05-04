@@ -43,7 +43,7 @@ For using Commanders API you should use namespace ```Dada.Commander```
 `ConsoleCommand` attribute has next fields:
 |Field|Default value|Description|
 |-----|-----------|-------------|
-|`commandName`|`""`|Name for Commander<br/> If you dont set `commandName` it takes name of method|
+|`commandName`|method name|Name for Commander<br/> If you dont set `commandName` it takes name of method|
 |`description`|`""`|Description for Commander <br/> This description can be shown in Commander's log|
 |`logResult`|`""`|Log result that will be written to the Commander's log after successful method apllying|
 |`commandFlag`|`CommandFlags.noFlags`|Flag that describe type of method|
