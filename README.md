@@ -16,7 +16,7 @@ Commander is a tool for your Unity game that makes it easy to create cheat comma
 Release version:
 follow [releases](https://github.com/ainurdada/com.dada.commander/releases)
 
-Experiment version:  
+Experimental version:  
 1. Open `Package Manager` in Unity
 2. Select `Add package from Git URL`
 3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`
