@@ -249,17 +249,23 @@ namespace Dada.Commander.Core
                 result.Add("this command not exist".SetColor(errorColor));
             }
         }
-        bool InvokeMethod(MethodInfo method, ref List<string> result, object obj, object[] parameters)
+        bool InvokeMethod(MethodInfo method, ref List<string> result, object obj, object[] _parameters)
         {
+            var parameters = _parameters != null && _parameters.Length > 0 ? _parameters.ToList() : new();
             ParameterInfo[] parameterInfo = method.GetParameters();
             if (parameters != null)
             {
-                if (parameters.Length != parameterInfo.Length)
+                if (parameters.Count != parameterInfo.Length)
                 {
-                    result = new List<string>() { $"incorrect number of parameters".SetColor(errorColor) };
-                    return false;
+                    var defaultValues = parameterInfo.Where(p => p.HasDefaultValue);
+                    parameters.AddRange(defaultValues.Select(v => v.DefaultValue));
+                    if (parameters.Count != parameterInfo.Length)
+                    {
+                        result = new List<string>() { $"incorrect number of parameters".SetColor(errorColor) };
+                        return false;
+                    }
                 }
-                for (int i = 0; i < parameters.Length; i++)
+                for (int i = 0; i < parameters.Count; i++)
                 {
                     if (!System.Object.ReferenceEquals(parameterInfo[i].ParameterType, parameters[i].GetType()))
                     {
@@ -282,7 +288,7 @@ namespace Dada.Commander.Core
                 }
                 return false;
             }
-            ParseReturnValue(method.Invoke(obj, parameters), ref result);
+            ParseReturnValue(method.Invoke(obj, parameters.ToArray()), ref result);
             return true;
         }
         void ParseReturnValue(object returnValue, ref List<string> result)
@@ -356,7 +362,6 @@ namespace Dada.Commander.Core
             commandName = null;
             parameters = null;
             int coincidenceCount = 0;
-            string currenCommand = null;
             foreach (string _cmd in commands)
             {
                 if (command.StartsWith(_cmd))
@@ -369,19 +374,18 @@ namespace Dada.Commander.Core
                     if (_cmd.Length > coincidenceCount)
                     {
                         coincidenceCount = _cmd.Length;
-                        currenCommand = _cmd;
+                        commandName = _cmd;
                     }
                 }
             }
-            if (currenCommand == null) return;
-            commandName = currenCommand;
+            if (commandName == null) return;
             command = command.Remove(0, commandName.Length);
             if (command[0] != ' ')
             {
                 commandName = null;
                 return;
             }
-            parameters = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            parameters = command.SplitLeavingInsideContext(' ', '"', '"');
         }
 
         /// <summary>
@@ -413,9 +417,10 @@ namespace Dada.Commander.Core
             List<string> types = new List<string>();
             foreach (CashedType cashedType in cashedTypes)
             {
-                string typeInfo = $"class {cashedType.type.Name} has {cashedType.GetMembers().Count()} console member(s):".SetColor(textColor) + " \n";
+                MemberInfo[] members = cashedType.GetMembers();
+                string typeInfo = $"class {cashedType.type.Name} has {members.Count()} console member(s):".SetColor(textColor) + " \n";
 
-                foreach (MemberInfo member in cashedType.GetMembers())
+                foreach (MemberInfo member in members)
                     typeInfo += member.Name.SetColor(textColor) + " \n";
 
                 types.Add(typeInfo);
