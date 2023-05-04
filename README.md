@@ -4,7 +4,8 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/Unity-white?style=flat&logo=unity&logoColor=000000">
-<img src="https://img.shields.io/badge/Version-1.0.1-success">
+<img src="https://img.shields.io/badge/Git repo-1.0.2 [experimental]-red">
+<img src="https://img.shields.io/badge/Release-1.0.1-success">
 <img src="https://img.shields.io/badge/License-MIT-success">
 </p>
 
@@ -25,7 +26,7 @@ For using Commanders API you should use namespace ```Dada.Commander```
 1. Add `ConsoleCommand` attribute for your method.  
     Example:
     ```c#
-        [ConsoleCommand]
+        [ConsoleCommand]    // <-- add this attribute
         static void SetMaxFps(int fps)
         {
             Application.targetFrameRate = fps;
