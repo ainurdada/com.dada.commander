@@ -50,7 +50,7 @@ namespace Dada.Commander.UI
 
         bool isShowed;
 
-        private void Awake()
+        private void Start()
         {
             if (Application.IsPlaying(gameObject))
             {
