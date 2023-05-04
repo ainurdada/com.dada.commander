@@ -26,7 +26,7 @@ For using Commanders API you should use namespace ```Dada.Commander```
 1. Add `ConsoleCommand` attribute for your method.  
     Example:
     ```c#
-        [ConsoleCommand]    // <-- add this attribute
+        [ConsoleCommand]    // <-- just add this attribute
         static void SetMaxFps(int fps)
         {
             Application.targetFrameRate = fps;
