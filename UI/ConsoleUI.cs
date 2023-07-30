@@ -66,7 +66,6 @@ namespace Dada.Commander.UI
             }
             else
             {
-                SerializedObject serialized = new SerializedObject(this);
                 if (editorInstance != null)
                 {
                     DestroyImmediate(editorInstance);

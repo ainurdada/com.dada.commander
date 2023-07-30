@@ -4,8 +4,8 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/Unity-white?style=flat&logo=unity&logoColor=000000">
-<img src="https://img.shields.io/badge/Git repo-1.0.2-success">
-<img src="https://img.shields.io/badge/Release-1.0.2-success">
+<img src="https://img.shields.io/badge/Git repo-1.0.3-success">
+<img src="https://img.shields.io/badge/Release-1.0.3-success">
 <img src="https://img.shields.io/badge/License-MIT-success">
 </p>
 
