@@ -10,7 +10,7 @@
 </p>
 
 ## About
-Commander is a tool for your Unity game that makes it easy to create cheat commands.  
+Commander is a tool for your Unity game that makes it easy to create developers commands.  
 
 ## Installation
 Release version:
