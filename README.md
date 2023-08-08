@@ -44,19 +44,24 @@ For using Commanders API you should use namespace ```Dada.Commander```
 |Field|Default value|Description|
 |-----|-----------|-------------|
 |`commandName`|method name|Name for Commander<br/> If you dont set `commandName` it takes name of method|
-|`description`|`""`|Description for Commander <br/> This description can be shown in Commander's log|
-|`logResult`|`""`|Log result that will be written to the Commander's log after successful method apllying|
+|`description`||Description for Commander <br/> This description can be shown in Commander's log|
+|`logResult`||Log result that will be written to the Commander's log after successful method apllying|
 |`commandFlag`|`CommandFlags.noFlags`|Flag that describe type of method|
 
 ## API
 ### `Commander` class has next methods:   
 |Method|Parameters|Descripton|
 |------|----------|----------|
-|`ApplyCommand`|string `command`,<br/> out List\<string> `log`|Invoke method or field by his command name and get a log result. <br/> `command` - command name and parameters of class member <br/> `log` - log result of applying command|
-|`GetSimilarCommand`|string `command`|Get the name of the commands that is most similar to the entered `command`|
+|`ApplyCommand`|`string` command,<br/> `out List<string>` log|Invoke method or field by his command name and get a log result. <br/> `command` - command name and parameters of class member <br/> `log` - log result of applying command|
+|`GetSimilarCommand`|`string` command|Get the name of the commands that is most similar to the entered `command`|
 |`GetAllConsoleTypes`||Get all class names that have methods with `ConsoleCommand` attribute|
-|`GetCommands`|bool `showDescription`|Get all commands with or without their descriptions|
-|`GetCommands`|bool `showDescription` <br/> CommandFlags `commandFlags`|Get commands with or without their descriptions that has `commandFlags`|
+|`GetCommands`|`bool` showDescription|Get all commands with or without their descriptions|
+|`GetCommands`|`bool` showDescription <br/> `CommandFlags` commandFlags|Get commands with or without their descriptions that has `commandFlags`|
+|`Log`|`string` message|Send message to |
+
+|Event|Callback type|Description|
+|-----|----------|-----------|
+|`LogEvent`|`string`| Called when Log method invokes and give a log message in callback| 
 
 ## Custom flags
 You can create your own custom flag set in `com.dada.commander\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
