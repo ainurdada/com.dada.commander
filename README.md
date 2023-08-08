@@ -13,13 +13,10 @@
 Commander is a tool for your Unity game that makes it easy to create developer commands.  
 
 ## Installation
-Release version:
-follow [releases](https://github.com/ainurdada/com.dada.commander/releases)
-
-Experimental version:  
-1. Open `Package Manager` in Unity
-2. Select `Add package from Git URL`
-3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`
+|Version:| Instruction|
+|----------------|---------------------------|
+|Release version:| follow [releases](https://github.com/ainurdada/com.dada.commander/releases)|
+Experimental version:| 1. Open `Package Manager` in Unity<br/> 2. Select `Add package from Git URL`<br/> 3. Paste Git URL: `https://github.com/ainurdada/com.dada.commander.git`|
 
 ## Get start
 For using Commanders API you should use namespace ```Dada.Commander```
