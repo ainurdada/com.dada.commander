@@ -57,7 +57,7 @@ For using Commanders API you should use namespace ```Dada.Commander```
 |`GetAllConsoleTypes`||Get all class names that have methods with `ConsoleCommand` attribute|
 |`GetCommands`|`bool` showDescription|Get all commands with or without their descriptions|
 |`GetCommands`|`bool` showDescription <br/> `CommandFlags` commandFlags|Get commands with or without their descriptions that has `commandFlags`|
-|`Log`|`string` message|Send message to |
+|`Log`|`string` message|Send message to `LogEvent` event|
 
 |Event|Callback type|Description|
 |-----|----------|-----------|
