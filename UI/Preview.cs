@@ -14,6 +14,7 @@ namespace Dada.Commander.UI
 
         [SerializeField] TextMeshProUGUI common;
         [SerializeField] TextMeshProUGUI error;
+        [SerializeField] TextMeshProUGUI warning;
 
         public string PrefixText
         {
@@ -60,6 +61,10 @@ namespace Dada.Commander.UI
         public void SetErrorColor(Color color)
         {
             error.text = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>error</color>";
+        }
+        public void SetWarningColor(Color color)
+        {
+            warning.text = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>warning</color>";
         }
     }
 }

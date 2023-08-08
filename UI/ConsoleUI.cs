@@ -1,9 +1,7 @@
-using Dada.Commander;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,6 +47,11 @@ namespace Dada.Commander.UI
         [HideInInspector] public event Action OnHided;
 
         bool isShowed;
+
+        private void Awake()
+        {
+            Commander.LogEvent += AddLog;
+        }
 
         private void Start()
         {
@@ -114,6 +117,12 @@ namespace Dada.Commander.UI
             {
                 logText.text += str + '\n';
             }
+            logContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, logText.preferredHeight);
+        }
+
+        public void AddLog(string text)
+        {
+            logText.text += text + '\n';
             logContent.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, logText.preferredHeight);
         }
 

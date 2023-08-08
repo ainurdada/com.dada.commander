@@ -31,6 +31,7 @@ namespace Dada.Commander.Core
 
         public string textColor = "white";
         public string errorColor = "red";
+        public string warningColor = "yellow";
 
         bool choosing = false;
         List<SavedMember> savedMembers = new List<SavedMember>();
@@ -129,7 +130,20 @@ namespace Dada.Commander.Core
                 else if (relevantMembers.Count() == 1)
                 {
                     MemberInfo member = relevantMembers.First();
-                    if (member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed)
+                    bool isMemberStatic = false;
+                    if(member is MethodInfo method)
+                    {
+                        isMemberStatic = method.IsStatic;
+                    }
+                    if(member is FieldInfo field)
+                    {
+                        isMemberStatic = field.IsStatic;
+                    }
+                    if(member is PropertyInfo property)
+                    {
+                        isMemberStatic = property.GetMethod.IsStatic;
+                    }
+                    if ((member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed) || isMemberStatic)
                     {
                         targetMember = new SavedMember(member, member.ReflectedType, parametersArray?.ToArray());
                     }
@@ -147,6 +161,7 @@ namespace Dada.Commander.Core
                         }
                         else
                         {
+                            result.Add($"select target:".SetColor(textColor));
                             int index = 0;
                             savedMembers.Clear();
                             foreach (var instance in objects)

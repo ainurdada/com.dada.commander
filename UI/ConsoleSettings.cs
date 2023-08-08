@@ -1,11 +1,11 @@
 using Dada.Commander.Core;
 using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 
 namespace Dada.Commander.UI
 {
+    [ExecuteAlways]
     public class ConsoleSettings : MonoBehaviour
     {
         #region Instance
@@ -22,7 +22,7 @@ namespace Dada.Commander.UI
         [Header("Log settings")]
         [SerializeField] CommandLog commandLog;
         [SerializeField] LogResult logResult;
-
+        [SerializeField, Tooltip("Duplicate log methods into unity console")] bool duplicateLog;
         #region Properties
         public bool HideAtTheStart
         {
@@ -71,20 +71,26 @@ namespace Dada.Commander.UI
         }
         public Color LogColor
         {
-            get { return logResult.logColor; }
+            get { return CommanderSettings.LogColor; }
             set
             {
-                logResult.logColor = value;
-                CommanderSettings.LogTextColor = $"#{ColorUtility.ToHtmlStringRGB(logResult.logColor)}";
+                CommanderSettings.LogColor = value;
             }
         }
         public Color LogErrorColor
         {
-            get { return logResult.logErrorColor; }
+            get { return CommanderSettings.LogErrorColor; }
             set
             {
-                logResult.logErrorColor = value;
-                CommanderSettings.LogErrorColor = $"#{ColorUtility.ToHtmlStringRGB(logResult.logErrorColor)}";
+                CommanderSettings.LogErrorColor = value;
+            }
+        }
+        public Color LogWarningColor
+        {
+            get { return CommanderSettings.LogWarningColor; }
+            set
+            {
+                CommanderSettings.LogWarningColor = value;
             }
         }
         public Color PrefixColor
@@ -112,23 +118,28 @@ namespace Dada.Commander.UI
 #endif
         private IEnumerator Start()
         {
-            yield return new WaitForEndOfFrame();
-            instance = this;
-            HideAtTheStart = hideAtTheStart;
-
-            LogBackgroundColor = logBackgroundColor;
-            InputBackgroundColor = inputBackgroundColor;
-            CommandColor = commandLog.commandColor;
-            CommandPrefix = commandLog.commandPrefix;
-            LogColor = logResult.logColor;
-            LogErrorColor = logResult.logErrorColor;
-            PrefixColor = commandLog.prefixColor;
+            if (Application.isPlaying)
+            {
+                yield return new WaitForEndOfFrame();
+                instance = this;
+                HideAtTheStart = hideAtTheStart;
+            }
+            ApplyChanges();
         }
 
         void ApplyChanges()
         {
             if (ConsoleUI.Instance != null)
             {
+                LogBackgroundColor = logBackgroundColor;
+                InputBackgroundColor = inputBackgroundColor;
+                CommandColor = commandLog.commandColor;
+                CommandPrefix = commandLog.commandPrefix;
+                LogColor = logResult.logColor;
+                LogErrorColor = logResult.logErrorColor;
+                LogWarningColor = logResult.logWarningColor;
+                PrefixColor = commandLog.prefixColor;
+
                 ConsoleUI.Instance.logBackground.color = logBackgroundColor;
                 ConsoleUI.Instance.inputBackGround.color = inputBackgroundColor;
 
@@ -139,7 +150,9 @@ namespace Dada.Commander.UI
 
                 ConsoleUI.Instance.preview.SetCommonColor(LogColor);
                 ConsoleUI.Instance.preview.SetErrorColor(LogErrorColor);
+                ConsoleUI.Instance.preview.SetWarningColor(LogWarningColor);
             }
+            CommanderSettings.DuplicateLog = duplicateLog;
         }
 
         [Serializable]
@@ -155,6 +168,7 @@ namespace Dada.Commander.UI
         {
             public Color logColor;
             public Color logErrorColor;
+            public Color logWarningColor;
         }
     }
 }

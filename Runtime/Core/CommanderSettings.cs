@@ -1,12 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Dada.Commander.Core
 {
     public static class CommanderSettings
     {
-        public static string LogErrorColor
+        #region Colors
+        public static string LogErrorColorHtml
         {
             get
             {
@@ -17,7 +16,25 @@ namespace Dada.Commander.Core
                 CommanderManager.Instance.errorColor = value;
             }
         }
-        public static string LogTextColor
+        public static Color LogErrorColor
+        {
+            get
+            {
+                if (ColorUtility.TryParseHtmlString(LogErrorColorHtml, out Color color))
+                {
+                    return color;
+                }
+                else
+                {
+                    return Color.green;
+                }
+            }
+            set
+            {
+                LogErrorColorHtml = $"#{ColorUtility.ToHtmlStringRGB(value)}";
+            }
+        }
+        public static string LogColorHtml
         {
             get
             {
@@ -26,6 +43,66 @@ namespace Dada.Commander.Core
             set
             {
                 CommanderManager.Instance.textColor = value;
+            }
+        }
+        public static Color LogColor
+        {
+            get
+            {
+                if (ColorUtility.TryParseHtmlString(LogColorHtml, out Color color))
+                {
+                    return color;
+                }
+                else
+                {
+                    return Color.white;
+                }
+            }
+            set
+            {
+                LogColorHtml = $"#{ColorUtility.ToHtmlStringRGB(value)}";
+            }
+        }
+        public static string LogWarningColorHtml
+        {
+            get
+            {
+                return CommanderManager.Instance.warningColor;
+            }
+            set
+            {
+                CommanderManager.Instance.warningColor = value;
+            }
+        }
+        public static Color LogWarningColor
+        {
+            get
+            {
+                if (ColorUtility.TryParseHtmlString(LogWarningColorHtml, out Color color))
+                {
+                    return color;
+                }
+                else
+                {
+                    return Color.yellow;
+                }
+            }
+            set
+            {
+                LogWarningColorHtml = $"#{ColorUtility.ToHtmlStringRGB(value)}";
+            }
+        }
+        #endregion
+
+        public static bool DuplicateLog
+        {
+            get
+            {
+                return Commander.duplicateLog;
+            }
+            set
+            {
+                Commander.duplicateLog = value;
             }
         }
     }
