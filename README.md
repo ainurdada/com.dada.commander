@@ -10,7 +10,7 @@
 </p>
 
 ## About
-Commander is a tool for your Unity game that makes it easy to create cheat commands.  
+Commander is a tool for your Unity game that makes it easy to create developer commands.  
 
 ## Installation
 Release version:
@@ -61,9 +61,9 @@ For using Commanders API you should use namespace ```Dada.Commander```
 ## Custom flags
 You can create your own custom flag set in `com.dada.commander\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
 
-## Console UI
+## Console UI (optional)
 You also can use built-in console UI. It is located on path `...\UI\Prefab`
-![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)
+![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)  
 Use namespace `Dada.Commander.UI` to manage console UI
 * To open or close console window use a `ConsoleController.ChangeOpenCloseState()` method.
 * Assign a `ConsoleController.FillAuto()` method call to the button you need. This is responsible for autofill
