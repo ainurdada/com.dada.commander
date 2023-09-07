@@ -46,26 +46,51 @@ For using Commanders API you should use namespace ```Dada.Commander```
 |`commandFlag`|`CommandFlags.noFlags`|Flag that describe type of method|
 
 ## API
-### `Commander` class has next methods:   
+### `Commander` class:   
 |Method|Parameters|Descripton|
 |------|----------|----------|
 |`ApplyCommand`|`string` command,<br/> `out List<string>` log|Invoke method or field by his command name and get a log result. <br/> `command` - command name and parameters of class member <br/> `log` - log result of applying command|
 |`GetSimilarCommand`|`string` command|Get the name of the commands that is most similar to the entered `command`|
+|`GetSimilarCommands`|`string` command|Get names of the commands that are similar to the entered command|
 |`GetAllConsoleTypes`||Get all class names that have methods with `ConsoleCommand` attribute|
 |`GetCommands`|`bool` showDescription|Get all commands with or without their descriptions|
 |`GetCommands`|`bool` showDescription <br/> `CommandFlags` commandFlags|Get commands with or without their descriptions that has `commandFlags`|
 |`Log`|`string` message|Send message to `LogEvent` event|
+|`LogWarning`|`string` message|Send message to `LogEvent` event|
+|`LogError`|`string` message|Send message to `LogEvent` event|
 
 |Event|Callback type|Description|
 |-----|----------|-----------|
-|`LogEvent`|`string`| Called when Log method invokes and give a log message in callback| 
+|`LogEvent`|`string`| Called when Log method invokes and give a log message in callback|
+
+|Property|Type|Description|
+|--------|----|-----------|
+|`PreviousCommands`|`List<string>`|List of previous commands, that have been sent to Commander|
 
 ## Custom flags
 You can create your own custom flag set in `com.dada.commander\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
 
-## Console UI (optional)
-You also can use built-in console UI. It is located on path `...\UI\Prefab`
+## Commander UI (optional)
+You also can use built-in UI console. It is located on path `Commander\UI\Prefab`
 ![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)  
 Use namespace `Dada.Commander.UI` to manage console UI
-* To open or close console window use a `ConsoleController.ChangeOpenCloseState()` method.
-* Assign a `ConsoleController.FillAuto()` method call to the button you need. This is responsible for autofill
+
+### CommanderUI API
+|Methods|Descripton|
+|-------|----------|
+|`CommanderUI.ChangeOpenCloseState()`|Open or close console window|
+|`CommanderUI.FillAuto()`|Autofill inputfield by similar command| 
+|`SelectNextHelperItem`|Select next command in PopUp command window|
+|`SelectPreviousHelperItem`|Select previous command in PopUp command window|
+|`SelectNextLastCommand`|Select an older command|
+|`SelectPreviousLastCommand`|Select a newer command|
+
+|Property|Type|Description|
+|--------|----|-----------|
+|`WindowIsShowed`|`bool`|True if the console is shown and false if not|
+|`PopUpHelperIsShowed`|`bool`|True if the PopUp command window is shown and false if not
+
+|Event|Description|
+|-----|-----------|
+|`OnShowed`|Called when the console is showed|
+|`OnHided`|Called when the console is hided|
