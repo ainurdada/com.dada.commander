@@ -36,8 +36,9 @@ For using Commanders API you should use namespace ```Dada.Commander```
         Commander.ApplyCommand("SetMaxFps 30", out List<string> log);
     ```
 
-## Attribute
-`ConsoleCommand` attribute has next fields:
+
+## API
+### `ConsoleCommand` attribute:
 |Field|Default value|Description|
 |-----|-----------|-------------|
 |`commandName`|method name|Name for Commander<br/> If you dont set `commandName` it takes name of method|
@@ -45,7 +46,6 @@ For using Commanders API you should use namespace ```Dada.Commander```
 |`logResult`||Log result that will be written to the Commander's log after successful method apllying|
 |`commandFlag`|`CommandFlags.noFlags`|Flag that describe type of method|
 
-## API
 ### `Commander` class:   
 |Method|Parameters|Descripton|
 |------|----------|----------|
@@ -75,7 +75,7 @@ You also can use built-in UI console. It is located on path `Commander\UI\Prefab
 ![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)  
 Use namespace `Dada.Commander.UI` to manage console UI
 
-### CommanderUI API
+### `CommanderUI` class:
 |Methods|Descripton|
 |-------|----------|
 |`CommanderUI.ChangeOpenCloseState`|Open or close console window|
