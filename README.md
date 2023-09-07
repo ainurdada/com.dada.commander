@@ -78,8 +78,8 @@ Use namespace `Dada.Commander.UI` to manage console UI
 ### CommanderUI API
 |Methods|Descripton|
 |-------|----------|
-|`CommanderUI.ChangeOpenCloseState()`|Open or close console window|
-|`CommanderUI.FillAuto()`|Autofill inputfield by similar command| 
+|`CommanderUI.ChangeOpenCloseState`|Open or close console window|
+|`CommanderUI.FillAuto`|Autofill inputfield by similar command| 
 |`SelectNextHelperItem`|Select next command in PopUp command window|
 |`SelectPreviousHelperItem`|Select previous command in PopUp command window|
 |`SelectNextLastCommand`|Select an older command|
