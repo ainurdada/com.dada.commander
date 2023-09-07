@@ -35,27 +35,36 @@ namespace Dada.Commander.Core
 
         bool choosing = false;
         List<SavedMember> savedMembers = new List<SavedMember>();
+        public List<string> PreviousCommands { get; private set; }
 
         /// <summary>
         /// Apply the command and get the log result
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="message"></param>
         /// <param name="result"></param>
-        public void ApplyCommand(string command, out List<string> result)
+        public void ApplyCommand(string message, out List<string> result)
         {
             result = new List<string>();
             bool match = false;
-            SavedMember targetMember = null;
+            List<SavedMember> targetMembers = new();
             if (choosing)
             {
-                if (int.TryParse(command, out int index))
+                if (int.TryParse(message, out int index))
                 {
-                    if (index >= savedMembers.Count() || index < 0)
+                    index--;
+                    if (index == -1)
                     {
-                        result = new() { ($"incorrect index: enter a number from {0} to {savedMembers.Count() - 1}").SetColor(errorColor) };
-                        return;
+                        targetMembers = savedMembers;
                     }
-                    targetMember = savedMembers[index];
+                    else
+                    {
+                        if (index >= savedMembers.Count() || index < 0)
+                        {
+                            result = new() { ($"incorrect index: enter a number from {0} to {savedMembers.Count()}").SetColor(errorColor) };
+                            return;
+                        }
+                        targetMembers.Add(savedMembers[index]);
+                    }
                 }
                 else choosing = false;
             }
@@ -63,7 +72,9 @@ namespace Dada.Commander.Core
 
             if (!choosing)
             {
-                ParseCommand(command, out string commandName, out string[] parameters);
+                PreviousCommands.Add(message);
+
+                ParseCommand(message, out string commandName, out string[] parameters);
 
                 #region set parameters
                 List<object> parametersList = new List<object>();
@@ -104,7 +115,8 @@ namespace Dada.Commander.Core
                     savedMembers.Clear();
                     choosing = true;
                     result.Add($"select target:".SetColor(textColor));
-                    int index = 0;
+                    result.Add($"0: select all".SetColor(textColor));
+                    int index = 1;
                     foreach (var member in relevantMembers)
                     {
                         if (member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed)
@@ -131,28 +143,28 @@ namespace Dada.Commander.Core
                 {
                     MemberInfo member = relevantMembers.First();
                     bool isMemberStatic = false;
-                    if(member is MethodInfo method)
+                    if (member is MethodInfo method)
                     {
                         isMemberStatic = method.IsStatic;
                     }
-                    if(member is FieldInfo field)
+                    if (member is FieldInfo field)
                     {
                         isMemberStatic = field.IsStatic;
                     }
-                    if(member is PropertyInfo property)
+                    if (member is PropertyInfo property)
                     {
                         isMemberStatic = property.GetMethod.IsStatic;
                     }
                     if ((member.ReflectedType.IsAbstract && member.ReflectedType.IsSealed) || isMemberStatic)
                     {
-                        targetMember = new SavedMember(member, member.ReflectedType, parametersArray?.ToArray());
+                        targetMembers.Add(new SavedMember(member, member.ReflectedType, parametersArray?.ToArray()));
                     }
                     else
                     {
                         UnityEngine.Object[] objects = UnityEngine.Object.FindObjectsByType(member.ReflectedType, FindObjectsSortMode.InstanceID);
                         if (objects.Length == 1)
                         {
-                            targetMember = new SavedMember(member, objects[0], parametersArray?.ToArray());
+                            targetMembers.Add(new SavedMember(member, objects[0], parametersArray?.ToArray()));
                         }
                         else if (objects.Length == 0)
                         {
@@ -162,7 +174,8 @@ namespace Dada.Commander.Core
                         else
                         {
                             result.Add($"select target:".SetColor(textColor));
-                            int index = 0;
+                            result.Add($"0: select all".SetColor(textColor));
+                            int index = 1;
                             savedMembers.Clear();
                             foreach (var instance in objects)
                             {
@@ -182,7 +195,7 @@ namespace Dada.Commander.Core
             }
             choosing = false;
 
-            if (targetMember != null)
+            foreach (SavedMember targetMember in targetMembers)
             {
                 bool successInvoke = false;
                 match = true;
@@ -282,6 +295,11 @@ namespace Dada.Commander.Core
                 }
                 for (int i = 0; i < parameters.Count; i++)
                 {
+                    if (System.Object.ReferenceEquals(parameterInfo[i].ParameterType, typeof(string)))
+                    {
+                        parameters[i] = parameters[i].ToString();
+                        continue;
+                    }
                     if (!System.Object.ReferenceEquals(parameterInfo[i].ParameterType, parameters[i].GetType()))
                     {
                         if (!(System.Object.ReferenceEquals(parameters[i].GetType(), typeof(int)) &&
@@ -424,6 +442,24 @@ namespace Dada.Commander.Core
         }
 
         /// <summary>
+        /// Get names of the commands that are similar to the entered command
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public List<string> GetSimilarCommands(string command)
+        {
+            List<string> resultCommands = new();
+            foreach (string cmd in commands)
+            {
+                if (cmd.StartsWith(command) && !resultCommands.Contains(cmd))
+                {
+                    resultCommands.Add(cmd);
+                }
+            }
+            return resultCommands;
+        }
+
+        /// <summary>
         /// Get all classes that have methods with ConsoleCommandAttribute
         /// </summary>
         /// <returns></returns>
@@ -478,6 +514,8 @@ namespace Dada.Commander.Core
 
         void Initialize()
         {
+            PreviousCommands = new();
+
             string appPath = Application.dataPath.Remove(Application.dataPath.Length - 7).Replace('/', '\\');
 
             List<CashedType> findedTypes = new List<CashedType>();

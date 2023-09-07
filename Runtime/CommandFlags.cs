@@ -5,10 +5,14 @@ namespace Dada.Commander
     [Flags]
     public enum CommandFlags
     {
-        //you can customize it
+        // default flag
         noFlags = 1,
+
+
+
+        //[Examples] you can customize it and add new
         main = 2,
-        help = 4,
+        hidedForHelp = 4,
         admin = 8,
 
 

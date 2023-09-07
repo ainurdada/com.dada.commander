@@ -8,6 +8,12 @@ namespace Dada.Commander
     public static class Commander
     {
         internal static bool duplicateLog = false;
+
+        /// <summary>
+        /// List of previous commands, that have been sent to Commander
+        /// </summary>
+        public static List<string> PreviousCommands => CommanderManager.Instance.PreviousCommands;
+
         /// <summary>
         /// Apply the command and get the log result
         /// </summary>
@@ -22,6 +28,14 @@ namespace Dada.Commander
         public static string GetSimilarCommand(string command)
         {
             return CommanderManager.Instance.GetSimilarCommand(command);
+        }
+
+        /// <summary>
+        /// Get names of the commands that are similar to the entered command
+        /// </summary>
+        public static List<string> GetSimilarCommands(string command)
+        {
+            return CommanderManager.Instance.GetSimilarCommands(command);
         }
 
         /// <summary>
@@ -51,31 +65,31 @@ namespace Dada.Commander
         /// <summary>
         /// Print common message in console
         /// </summary>
-        public static void Log(string message)
+        public static void Log(object message)
         {
             if (duplicateLog) Debug.Log(message);
-            message = message.SetColor(CommanderSettings.LogColorHtml);
-            LogEvent?.Invoke(message);
+            message = message.ToString().SetColor(CommanderSettings.LogColorHtml);
+            LogEvent?.Invoke(message.ToString());
         }
 
         /// <summary>
         /// Print error message in console
         /// </summary>
-        public static void LogError(string message)
+        public static void LogError(object message)
         {
             if (duplicateLog) Debug.LogError(message);
-            message = message.SetColor(CommanderSettings.LogErrorColorHtml);
-            LogEvent?.Invoke(message);
+            message = message.ToString().SetColor(CommanderSettings.LogErrorColorHtml);
+            LogEvent?.Invoke(message.ToString());
         }
 
         /// <summary>
         /// Print warning message in console
         /// </summary>
-        public static void LogWarning(string message)
+        public static void LogWarning(object message)
         {
             if (duplicateLog) Debug.LogWarning(message);
-            message = message.SetColor(CommanderSettings.LogWarningColorHtml);
-            LogEvent?.Invoke(message);
+            message = message.ToString().SetColor(CommanderSettings.LogWarningColorHtml);
+            LogEvent?.Invoke(message.ToString());
         }
 
         /// <summary>
