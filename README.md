@@ -10,7 +10,7 @@
 </p>
 
 ## About
-Commander is a tool for your Unity game that makes it easy to create developer commands.  
+Commander is a developer console. Fast, simple and has many features.  
 
 ## Installation
 |Version:| Instruction|
@@ -32,7 +32,7 @@ For using Commanders API you should use namespace ```Dada.Commander```
 2. **Thats all!** Now you can write method's name in the console ui. But there are still a lot of additional settings that will help when working with the commander. About them further.
 
 ## Commander UI
-You also can use built-in UI console. It is located on path `Commander\UI\Prefab`
+Console UI is located on path `Commander\UI\Prefab`
 ![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)  
 Use namespace `Dada.Commander.UI` to manage console UI
 
