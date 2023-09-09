@@ -29,15 +29,35 @@ For using Commanders API you should use namespace ```Dada.Commander```
             Application.targetFrameRate = fps;
         }
     ```
-2. Now you can manage method with attribute `ConsoleCommand` from any place in your code using `Commander` class.  
-    Example:
-    ```c#
-        //this method invoke method SetMaxFps and give log result
-        Commander.ApplyCommand("SetMaxFps 30", out List<string> log);
-    ```
+2. **Thats all!** Now you can write method's name in the console ui. But there are still a lot of additional settings that will help when working with the commander. About them further.
+
+## Commander UI
+You also can use built-in UI console. It is located on path `Commander\UI\Prefab`
+![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)  
+Use namespace `Dada.Commander.UI` to manage console UI
+
+### `CommanderUI` class:
+|Methods|Descripton|
+|-------|----------|
+|`CommanderUI.ChangeOpenCloseState`|Open or close console window|
+|`CommanderUI.FillAuto`|Autofill inputfield by similar command| 
+|`SelectNextHelperItem`|Select next command in PopUp command window|
+|`SelectPreviousHelperItem`|Select previous command in PopUp command window|
+|`SelectNextLastCommand`|Select an older command|
+|`SelectPreviousLastCommand`|Select a newer command|
+
+|Property|Type|Description|
+|--------|----|-----------|
+|`WindowIsShowed`|`bool`|True if the console is shown and false if not|
+|`PopUpHelperIsShowed`|`bool`|True if the PopUp command window is shown and false if not
+
+|Event|Description|
+|-----|-----------|
+|`OnShowed`|Called when the console is showed|
+|`OnHided`|Called when the console is hided|
 
 
-## API
+## Core API
 ### `ConsoleCommand` attribute:
 |Field|Default value|Description|
 |-----|-----------|-------------|
@@ -69,28 +89,3 @@ For using Commanders API you should use namespace ```Dada.Commander```
 
 ## Custom flags
 You can create your own custom flag set in `com.dada.commander\Runtime\CommandFlags.cs` file, but you always should have `all` flag that contains all bytes of another flags. 
-
-## Commander UI (optional)
-You also can use built-in UI console. It is located on path `Commander\UI\Prefab`
-![](https://i.ibb.co/4KGj2Lt/Console-UIPreview.png)  
-Use namespace `Dada.Commander.UI` to manage console UI
-
-### `CommanderUI` class:
-|Methods|Descripton|
-|-------|----------|
-|`CommanderUI.ChangeOpenCloseState`|Open or close console window|
-|`CommanderUI.FillAuto`|Autofill inputfield by similar command| 
-|`SelectNextHelperItem`|Select next command in PopUp command window|
-|`SelectPreviousHelperItem`|Select previous command in PopUp command window|
-|`SelectNextLastCommand`|Select an older command|
-|`SelectPreviousLastCommand`|Select a newer command|
-
-|Property|Type|Description|
-|--------|----|-----------|
-|`WindowIsShowed`|`bool`|True if the console is shown and false if not|
-|`PopUpHelperIsShowed`|`bool`|True if the PopUp command window is shown and false if not
-
-|Event|Description|
-|-----|-----------|
-|`OnShowed`|Called when the console is showed|
-|`OnHided`|Called when the console is hided|
